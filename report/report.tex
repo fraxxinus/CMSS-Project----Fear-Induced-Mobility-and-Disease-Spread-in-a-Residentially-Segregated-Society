@@ -1,0 +1,297 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{setspace}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{placeins}
+\usepackage{csquotes}
+\usepackage[natbibapa]{apacite}
+
+\onehalfspacing
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.5em}
+
+\title{Fear-Induced Mobility and Disease Spread in a Residentially Segregated Society}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+
+\newpage
+\section{Introduction}
+
+Epidemics have played a significant role in forming human societies throughout history. Epidemics were not only structured by the biological factors, but the spreading also depends on the societal structure of the population and the behaviour of the people during the spread of the diseases. One of the important factors is the social structure, which is the residential segregation. In segregated societies, people usually tend to live near people with the same preferences and have less contact with people in other formed groups. This spatial organization can impact whether the disease will spread mainly inside one group or be transmitted easily to other groups as well. Moreover, the behaviour of the people can change during an epidemic. When people fear the infection, they tend to avoid infected people or even relocate from the area they consider risky. This specific behaviour changes the way contacts are upheld and can potentially alter the way a disease spreads within the segregated society. 
+
+
+This research analyzes the relocation caused by the fear of infection based on a segregated society. With the use of the Schelling model, a segregated society is created. Next, the disease is introduced and two scenarios are compared. In the first scenario, the agents cannot move after the introduction of the disease, and in the second, the agents are allowed to move if there are infected neighbors and there is fear of infection. The goal of the research is to compare these two scenarios in different conditions and track different parameters that would lead to the conclusion of how the infection spreads differently when the fear of infection is introduced.
+
+\subsection{Literature Connection}
+This research is firstly based on the main ideas found in the paper written by \citet{schelling1971dynamic}, which models how the simple individual rules of movement can lead to strong residential segregation on the scale of the whole society. In the model, individuals belong to a specific group and are put on a grid, and each individual checks its neighbors and decides whether or not they will move based on the fact if they have enough neighbors from the same group. The main idea of this paper is that even relatively small individual preferences can lead to strong segregation. It is important to note that Schelling’s model is used in the first part of this simulation, where there are four different groups, and each individual/agent can move if they are not happy with the number of neighbors of the same type. In this way, the residential segregation is created before the disease is introduced in the segregated model. 
+
+Secondly, \citet{bagnoli2007risk} show that fear is a powerful mechanism in limiting the spread of disease. Simply risk perception has been shown to reduce the number of infections and increasing this fear shows an increasing, but diminishing return in terms of reducing the number of infections.
+
+Thirdly, a paper written by \citet{epstein2008coupled}, investigates the relationship between the spread of the disease and the spread of the fear of the disease. Their idea comes from the fact that during an epidemic, people do not behave passively, but can change their behaviour based on the fear of the infection. For example, people can avoid physical contact, self-isolate, or even leave the areas that seem dangerous. This idea is connected to the second part of this research’s simulation, where two models are made in which the disease is introduced. The part to consider is that in reality groups often are already segregated. Therefore, we seek to see if their work can be replicated for this scenario and if we can find additional insights in additional scenarios and variables being tracked. 
+
+In more recent work, \citet{panicker2024social} show the idea of social adaptation in a network, in which agents are able to move based on the fear of infection and were able to reduce the amount of infected by moving away from affected node neighbors. However, the second peak behaviour usually seen in real life epidemics is missing. While many parameters discovered are interesting, they have not been tested on a Schelling model. Since they mention limiting the movement to produce this scenario, we limit the movement by the open spaces in the Schelling model.
+
+Furthermore, it should be emphasized that the above-mentioned research ideas are usually observed separately. The new initiative in this exploration studies the relationship between the existing residential segregation and the segregation after the movements caused by the introduction of fear.
+
+
+\subsection{Research Question}
+The study addresses the following research question to be answered: 
+
+\textbf{Does fear-driven relocation reduce cumulative infections and peak prevalence while increasing cross-group neighbor exposure in a Schelling-segregated population?}
+
+
+\section{Methodology}
+\subsection{Simulation Design}
+To answer the above research question, a two-step Python simulation has been run. As mentioned before, the first step involves creating a segregated society, and the second step involves running models a and b with their own characteristics.
+
+The general approach in the simulation is to use the Python Mesa library, which allows an easy management of the whole model and its agents. It also has some grid functions that can be used to simplify the grid creation and usage. Overall, the grid of 100x100 size has been used with 10\% of empty cells and 90\% of agents. Each had one of the four groups associated with it, equally distributed. 
+
+In the first part, where the segregation needs to be achieved, the model is run until the equilibrium is reached with a tolerance of 0.5. The equilibrium means that all agents are happy with their spot, and the tolerance of 0.5 means that the agent, in order to be happy with its spot, has to have at least 50\% of the same group neighbors. If the happiness is less than 0.5, then the agent is unhappy and moves to a random empty spot. The agent happiness score has been calculated with this formula:
+
+\[
+HappinessScore = \frac{S_{same}}{N}
+\]
+
+where \(S_{same} \) represents the same group neighbors, and N represents the total neighbors, total cells around the agent where the cell is not empty.
+
+Furthermore, in the second part, two models are run as a continuation of the first part. In both models, the same agents are initially infected, and only 1.5\% of the whole population is randomly selected. The infection lasts seven days, and after that period, they become immune to getting an infection again. The agents in this part have three different states – healthy, infected, recovered. It is important to note that at each model step, the disease is spread with the following formula in mind:
+
+\[
+P(infection) = 1 - [(1 - \beta_{diff})^{k_{diff}} \cdot (1 - \beta_{same})^{k_{same}}]
+\]
+
+where \(P(infection)\) represents the probability of getting infected, \( k_{same} \) is the number of infected people from the same group that are in neighboring cells, and \( k_{diff} \) is the number of infected people from the different group that are in neighboring cells.
+
+
+In model A, the disease is introduced, and agents are not able to move. Here, the natural spread of the disease in the segregated communities is measured. In model B, agents have the ability to move based on the fear of disease and the number of neighbors in the same group. Their movement score is calculated using the following formula:
+\[
+M = (a \cdot S_{same} / N) - (b \cdot S_{infected} / N)
+\]
+where \(S_{same}\) represents the same group neighbors, \(S_{infected}\) represents the infected neighbors, and N is the total number of occupied cells around the agent. More importantly, if the result is less than 0.5, then the agent is not satisfied at that cell and moves to another random empty spot.
+It is important to note that $\beta_{diff}$, $\beta_{same}$, a, and b are just parameters used in this study, and they will be changed as needed and adapted to what will be tested in the case alongside other parameters. This can help, for example by introducing stronger feelings of fear.
+
+
+\subsection{Parameter Setup}
+
+The parameter setup of the model is seen in Table \ref{tab:simulation-parameters}.
+
+\begin{table}[htbp]
+\centering
+\caption{Main simulation parameter values used in the experiments.}
+\label{tab:simulation-parameters}
+\begin{tabular}{ll}
+\toprule
+Parameter & Value \\
+\midrule
+Grid size & \(100 \times 100\) cells \\
+Number of agents & 9000 \\
+Empty cells & 1000 \\
+Number of groups & 4 \\
+Initial infected agents & 20 \\
+Recovery time & 10 steps \\
+Number of simulation steps & 150 \\
+Number of random seeds & 5 \\
+Fear parameter \(b\) & 1.5 in the baseline model \\
+Fear sweep values & \(b = 0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0\) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Test Design}
+
+Models A (without mobility) and B (mobility driven by fear) were contrasted with respect to their development over time.
+To test the extent to which behavioural reaction affects the outcome of the disease, fear parameter (b) was altered within various values while keeping all other parameters constant.
+For yet another test, the influence of the starting arrangement of infected individuals on the outcomes of the epidemic was assessed. Infection strategies considered in this case included infection distribution in the population randomly, infections only in one particular group, and infection concentration along the borders of each group.
+
+
+
+\subsection{Data Analysis}
+While the models are being executed, different statistics are being collected separately in both models:
+\begin{itemize}
+    \item total number of infected agents,
+    \item maximum number of concurrent infected agents,
+    \item epidemic duration,
+    \item number of agents that have an infected agent from a different group,
+    \item agents with at least one neighbor from another group,
+    \item beginning and ending index of the segregation.
+\end{itemize}
+These collected statistics are then compared and help in making a reasonable and sound conclusion.
+
+Generally, 5 seeds are used (111, 222, 333, 444, 555) to ensure that the results are not due to random chance. The results are averaged across these seeds, and the standard deviation is calculated to understand the variability of the outcomes.
+The graphs are enhanced by including their 95\% confidence interval, which can be seen as a shadow in the same colour behind the average. 
+
+\section{Results}
+
+In the following section, the graphs are colour coded such that blue always represents Model A, while red represents Model B.
+
+\subsection{Comparison of Disease Spread With and Without Movement}
+The main comparison graphs for infection, movement, and mixing are grouped in Figure~\ref{fig:model-comparison}.
+  
+\begin{figure}[htbp]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{../figures/plot_05_epidemic_curves.png}
+        \textbf{(a)} Epidemic curves
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{../figures/plot_06_movement_and_infection_model_b.png}
+        \textbf{(b)} Movement and infection in Model B
+    \end{minipage}
+    
+    \vspace{0.4cm}
+    
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{../figures/plot_07_mixing_and_infection_model_a.png}
+        \textbf{(c)} Mixing and infection in Model A
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{../figures/plot_08_mixing_and_infection_model_b.png}
+        \textbf{(d)} Mixing and infection in Model B
+    \end{minipage}
+    \caption{Comparison of disease spread with and without fear-driven movement. The grouped graphs show epidemic curves, movement response, and mixing patterns for Model A and Model B.}
+    \label{fig:model-comparison}
+\end{figure}
+
+As expected, the total amount of infected agents in Model A was \((mean = 7875.0, std dev = 84.9)\) agents, while in Model B only \((mean = 3525.0, std dev = 184.3)\) infected were counted. The same is true for peak infections, which decreased from \((mean = 1529.2, std dev = 86.9)\) to \((mean = 743.0, std dev = 44.1)\).
+The number of movements in Model B in total was \((mean = 110394.4, std dev = 8864.7)\) and increased when the number of infections was high and had its peak shortly after the peak of infections as seen in Figure~\ref{fig:model-comparison}. In Model A, no movements occurred by definition.
+
+Less unexpected results were observed, changes were seen in terms of the social characteristics of the population. The number of agents who had neighbours belonging to another group increased in Model B \((mean = 4343.2, std dev = 278.6)\) from Model A \((mean = 3131.4, std dev = 77.6)\). 
+Additionally, there is a slight indication in Figure~\ref{fig:model-comparison} for having a first and second wave of the epidemic in model B, which is not present in Model A.
+
+\subsection{Effect of Fear Intensity} 
+As seen in Figure~\ref{fig:fear-factor-sweep}, with increasing values of fear parameter (b), the total number of agents that got infected during the epidemic dropped (\(mean = 7938.8, std dev = 34.0\) at \(b=0\) and \((mean = 1507.0, std dev = 59.0)\) at \(b=3.0\)). This drop was highest for moderate to high values of b, beyond which it levelled off.
+Movement made by the agents was highest at intermediate levels of fear. There was an increase in movement from low to moderate levels of fear, followed by a decrease at higher levels of fear.
+While segregation values did not show much change, highest segregation was recorded at low to moderate fear values, while lower segregation values were found for higher fear values. This shows a similar pattern to the epidemic duration.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.9\textwidth]{../figures/plot_09_fear_factor_sweep.png}
+    \caption{Effect of the fear parameter on infections, epidemic duration, movement, and segregation outcomes.}
+    \label{fig:fear-factor-sweep}
+\end{figure}
+
+\FloatBarrier
+
+\subsection{Effect of Initial Infection Location}
+Model A exhibited no substantial differences in total numbers of infections in any of the three starting conditions.
+In Model B, there seemed to be more variance in terms of starting conditions. The starting scenario where infections started in only one particular group yielded smaller total numbers of infections than either the random-starting or border-starting scenarios.
+Model B showed almost equal total numbers of infections for the random and border starting scenarios; however, infections in the border scenario were slightly fewer.
+
+
+
+
+\begin{table}[htbp]
+\centering
+\caption{Outcomes by initial infection location for Model A and Model B.}
+\label{tab:infection-location-models}
+
+\vspace{0.8em}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+
+\begin{minipage}{0.49\textwidth}
+\centering
+\textbf{Model A}
+
+\vspace{0.4em}
+
+\begin{tabular}{lrrrr}
+\toprule
+Location & \multicolumn{2}{c}{Total infected} & \multicolumn{2}{c}{Peak infected} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+ & mean & std devev & mean & std devev \\
+\midrule
+Random & 7875.0 & 84.9 & 1529.2 & 86.9 \\
+One group & 7894.2 & 91.7 & 938.0 & 24.7 \\
+Boundaries & 7950.8 & 41.2 & 1480.4 & 86.3 \\
+\bottomrule
+\end{tabular}
+\end{minipage}
+\hfill
+\begin{minipage}{0.49\textwidth}
+\centering
+\textbf{Model B}
+
+\vspace{0.4em}
+
+\begin{tabular}{lrrrr}
+\toprule
+Location & \multicolumn{2}{c}{Total infected} & \multicolumn{2}{c}{Peak infected} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+ & mean & std devev & mean & std devev \\
+\midrule
+Random & 3525.0 & 184.3 & 743.0 & 44.1 \\
+One group & 1902.6 & 168.6 & 545.4 & 13.9 \\
+Boundaries & 3056.2 & 122.1 & 561.6 & 40.2 \\
+\bottomrule
+\end{tabular}
+\end{minipage}
+
+\end{table}
+
+
+
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.9\textwidth]{../figures/plot_12_starting_infection_variant_epidemic_curves.png}
+    \caption{Epidemic curves for different initial infection placements: random population, single group, and group boundary.}
+    \label{fig:starting-infection-curves}
+\end{figure}
+
+\FloatBarrier
+\section{Discussion}
+
+Similar to \citet{epstein2008coupled}, one of the goals of this study was to see the impact of fear-induced mobility on the spread of diseases in a socially segregated population. In all three experiments, it can be seen that the ability of individuals to move away from sick people has substantially reduced both the number of infections and the peak prevalence of the disease.
+Interestingly, mobility not only decreased the level of infection but also made it possible for agents to have more contact with other groups of the population. The avoidance of infected people had a greater influence on the transmission of infection within the local area than on the number of contacts. Therefore, Model B always had less prevalent outbreaks than Model A.
+The suspicion of \citet{panicker2024social} regarding a second wave also looks to be prevalent. The effect could be replicated with different seeds, but the dip between the two waves is small.
+
+Another finding is connected to fear parameters as proposed by \citet{bagnoli2007risk}. With their increase, there were fewer infections with diminishing returns. However, introducing a little fear even prolonged the epidemic. This is wanted, since lower levels of infection at the cost of longer duration is generally seen as less taxing on the health system.
+The change in segregation level was relatively small. While more edges between the groups were created, the overall level of segregation did not change substantially.
+
+In Model A, no matter where the infections were initiated, the amount of the final infected agents was the same. However, the curve was flattened compared to baseline. This is beneficial, since in real life, a flatter curve also means a less overwhelmed healthcare systems \citep{feng2020benefits}.
+As for Model B, the epidemics that occurred in one and the same community led to a lower level of infection spread in comparison with the random location of the source and the source located along the border between communities. It suggests that behavioural adaptation becomes efficient in the case when the infection should pass barriers in order to reach other communities.
+
+From the above mentioned, we can conclude that behavioural adaptation plays an essential role in the epidemic process. In this case, fear-driven movement decreased the number of cases and increased social mixing. The relationship between the amount of fear and the spread was a more complex one, but generally showed a positive effect. This was especially the case when the epidemic started in one group.
+
+
+\section{Limitations}
+The first limitation relates to the disease model that is very simple. The agents may infect each other only if they are neighbours. At the same time, the period of the infectious state is always equal in length regardless of the specific agent under consideration. Finally, recovery from the illness leads to complete immunity against infection.
+
+The second limitation involves the behaviour of the agents. It assumes that all the individuals have identical behavioural patterns based on the same fear parameter and decision-making algorithm. However, in reality, every person has his/her own approach to the problem under discussion and the methods to move change in distance and type according to many factors.
+
+Thirdly, in the model, the population is assumed to consist of an abstract two-dimensional lattice, which is divided into four equally-sized subgroups. Though the model is efficient when studying the problems of segregation and agent-to-agent interactions, actual social networks are much more complicated and are not limited by contacts within the immediate neighbourhood.
+
+In addition, the fear mechanism used in the study assumes that people fear only their neighbours who have already been exposed to the infection. There are no sources of information available to the agents in terms of mass media or other people's opinions.
+Lastly, since the aim of the study was not to make any predictions for actual epidemics or particular diseases, the simulation findings must be regarded as a purely theoretical explanation of the processes involved.
+
+
+\section{Conclusions}
+The findings indicate that movement driven by fear leads to less total infection and fewer peak numbers of infected individuals. However, in this context, movement also led to an increase in interaction between different social groups. This could indicate a secondary benefit from the movement and could isnpire further research on how avoidance of one thing can lead to more interaction in another.
+
+Furthermore, the studies demonstrated that higher levels of avoidance usually caused smaller epidemics; however, their positive impact lessened with increases in fear level. Additionally, the efficiency of avoidance was influenced by the area where epidemics started. Epidemics emerging in one group resulted in lower numbers of infected individuals compared to epidemics starting randomly across the network or at its borders only when movement is allowed.
+
+Therefore, it is possible to conclude that behavioural characteristics can affect epidemic development substantially. In the current study, fear-induced mobility influenced the pattern of spreading enough to limit disease diffusion, yet not to change substantially the level of segregation in the system.
+
+\newpage
+
+\renewcommand{\refname}{Literature}
+\bibliographystyle{apacite}
+\bibliography{references}
+
+\end{document}
